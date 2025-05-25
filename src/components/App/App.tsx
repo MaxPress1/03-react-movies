@@ -13,20 +13,18 @@ export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<Movie>();
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedMovie(undefined);
+    setSelectedMovie(null);
   };
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string): Promise<void> => {
     setIsLoading(true);
-
-    const token = import.meta.env.VITE_TMDB_TOKEN;
-
+    setIsError(false);
     try {
-      const results = await fetchMovies(token, query);
+      const results = await fetchMovies(query);
       if (results.length === 0) {
         toast("No movies found for your request.");
         return;
@@ -39,12 +37,9 @@ export default function App() {
     }
   };
 
-  const handleSelectMovie = (id: number) => {
-    const movie = movies.find((m) => m.id === id);
-    if (movie) {
-      setSelectedMovie(movie);
-      openModal();
-    }
+  const handleSelectMovie = (movie: Movie): void => {
+    setSelectedMovie(movie);
+    openModal();
   };
   return (
     <div className={css.app}>
